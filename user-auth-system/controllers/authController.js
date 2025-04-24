@@ -63,10 +63,21 @@ exports.register = async (req, res) => {
 // @access  Public
 exports.login = async (req, res) => {
   try {
+    console.log('Login request received:', req.body);
     const { email, password } = req.body;
+
+    // Validate input
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide email and password'
+      });
+    }
 
     // Check for user email
     const user = await User.findOne({ email }).select('+password');
+    console.log('User found:', user ? `${user.email} (${user.role})` : 'No user found');
+    
     if (!user) {
       return res.status(401).json({ 
         success: false, 
@@ -76,6 +87,8 @@ exports.login = async (req, res) => {
 
     // Check if password matches
     const isMatch = await user.matchPassword(password);
+    console.log('Password match:', isMatch);
+    
     if (!isMatch) {
       return res.status(401).json({ 
         success: false, 
@@ -83,6 +96,10 @@ exports.login = async (req, res) => {
       });
     }
 
+    // Generate token
+    const token = generateToken(user._id);
+    
+    // Send response
     res.status(200).json({
       success: true,
       user: {
@@ -91,10 +108,10 @@ exports.login = async (req, res) => {
         email: user.email,
         role: user.role
       },
-      token: generateToken(user._id)
+      token
     });
   } catch (error) {
-    console.error(error);
+    console.error('Login error:', error);
     res.status(500).json({ 
       success: false, 
       message: 'Server Error', 

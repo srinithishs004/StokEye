@@ -33,6 +33,8 @@ export const AuthProvider = ({ children }) => {
         console.error('Authentication error:', err);
         localStorage.removeItem('token');
         delete axios.defaults.headers.common['Authorization'];
+        setUser(null);
+        setIsAuthenticated(false);
       }
       
       setIsLoading(false);
@@ -53,9 +55,13 @@ export const AuthProvider = ({ children }) => {
         setUser(res.data.user);
         setIsAuthenticated(true);
         return true;
+      } else {
+        setError(res.data.message || 'Registration failed');
+        return false;
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
+      console.error('Registration error:', err);
+      setError(err.response?.data?.message || 'Registration failed. Please try again.');
       return false;
     }
   };
@@ -63,18 +69,59 @@ export const AuthProvider = ({ children }) => {
   // Login user
   const login = async (userData) => {
     setError(null);
+    
+    // Validate input
+    if (!userData.email || !userData.password) {
+      setError('Email and password are required');
+      return false;
+    }
+    
     try {
-      const res = await axios.post('/api/auth/login', userData);
+      console.log('Attempting login with:', { email: userData.email });
+      
+      const res = await axios.post('/api/auth/login', userData, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      console.log('Login response:', res.data);
       
       if (res.data.success) {
+        // Store token and set auth header
         localStorage.setItem('token', res.data.token);
         axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;
+        
+        // Update state
         setUser(res.data.user);
         setIsAuthenticated(true);
         return true;
+      } else {
+        setError(res.data.message || 'Login failed');
+        return false;
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
+      console.error('Login error:', err);
+      console.error('Error details:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status,
+        stack: err.stack
+      });
+      
+      // Set appropriate error message
+      if (err.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        setError(err.response.data?.message || `Server error: ${err.response.status}`);
+      } else if (err.request) {
+        // The request was made but no response was received
+        setError('No response from server. Please check your connection.');
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        setError(`Error: ${err.message}`);
+      }
+      
       return false;
     }
   };

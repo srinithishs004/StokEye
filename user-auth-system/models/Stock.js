@@ -1,5 +1,34 @@
 const mongoose = require('mongoose');
 
+const HistoricalDataSchema = new mongoose.Schema({
+  date: {
+    type: Date,
+    required: true
+  },
+  price: {
+    type: Number,
+    required: true
+  },
+  open: {
+    type: Number
+  },
+  high: {
+    type: Number
+  },
+  low: {
+    type: Number
+  },
+  volume: {
+    type: Number
+  },
+  change: {
+    type: Number
+  },
+  changePercent: {
+    type: Number
+  }
+}, { _id: false });
+
 const StockSchema = new mongoose.Schema({
   symbol: {
     type: String,
@@ -34,6 +63,10 @@ const StockSchema = new mongoose.Schema({
   lastUpdated: {
     type: Date,
     default: Date.now
+  },
+  historicalData: {
+    type: [HistoricalDataSchema],
+    default: []
   }
 });
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import NotificationCenter from './NotificationCenter';
 
 const Navbar = () => {
   const { isAuthenticated, logout, user } = useAuth();
@@ -40,6 +41,9 @@ const Navbar = () => {
                 </li>
                 <li className="nav-item">
                   <span className="nav-link">Welcome, {user?.name}</span>
+                </li>
+                <li className="nav-item">
+                  <NotificationCenter />
                 </li>
                 <li className="nav-item">
                   <button 

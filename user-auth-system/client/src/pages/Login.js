@@ -27,15 +27,36 @@ const Login = () => {
       return;
     }
 
-    // Login user
-    const success = await login({ email, password });
-    if (success) {
-      // Redirect based on user role
-      if (user.role === 'admin') {
-        navigate('/admin/dashboard');
+    try {
+      console.log('Submitting login form with email:', email);
+      
+      // Login user
+      const success = await login({ email, password });
+      console.log('Login result:', success);
+      
+      if (success) {
+        console.log('Login successful, user:', user);
+        
+        // Small delay to ensure user state is updated
+        setTimeout(() => {
+          // Redirect based on user role
+          if (user && user.role === 'admin') {
+            navigate('/admin/dashboard');
+          } else {
+            navigate('/dashboard');
+          }
+        }, 100);
       } else {
-        navigate('/dashboard');
+        // If login failed but no error was set in the auth context
+        if (!error) {
+          setFormError('Login failed. Please check your credentials.');
+        } else {
+          setFormError(error);
+        }
       }
+    } catch (err) {
+      console.error('Login submission error:', err);
+      setFormError('An unexpected error occurred. Please try again.');
     }
   };
 
@@ -43,9 +64,15 @@ const Login = () => {
     <div className="auth-container">
       <h2 className="text-center mb-4">Login</h2>
       
-      {(formError || error) && (
+      {formError && (
         <div className="alert alert-danger" role="alert">
-          {formError || error}
+          {formError}
+        </div>
+      )}
+      
+      {error && !formError && (
+        <div className="alert alert-danger" role="alert">
+          {error}
         </div>
       )}
       

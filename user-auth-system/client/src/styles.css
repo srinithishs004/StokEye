@@ -5,6 +5,67 @@ body {
   background-color: #f8f9fa;
 }
 
+/* Notification Center Styles */
+.notification-center {
+  position: relative;
+}
+
+.notification-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 320px;
+  max-height: 400px;
+  overflow-y: auto;
+  background: white;
+  border-radius: 4px;
+  z-index: 1000;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.notification-header {
+  border-bottom: 1px solid #eee;
+}
+
+.notification-body {
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.notification-body .list-group-item {
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border-left: none;
+  border-right: none;
+}
+
+.notification-body .list-group-item:hover {
+  background-color: #f8f9fa;
+}
+
+/* Real-time indicator */
+.real-time-indicator {
+  display: flex;
+  align-items: center;
+  font-size: 0.8rem;
+}
+
+.real-time-indicator .badge {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 .auth-container {
   max-width: 400px;
   margin: 50px auto;
